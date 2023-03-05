@@ -1,59 +1,36 @@
-<script>
-	import Counter from './Counter.svelte';
-	import welcome from '$lib/images/svelte-welcome.webp';
-	import welcome_fallback from '$lib/images/svelte-welcome.png';
+<script lang="ts">
+	import type { PageData } from './$types';
+
+	export let data: PageData;
+	let fetchedPoints: number;
+	let processed: number = 0;
+	let managers: number = 10000;
+
+	async function fetchManagerData(managerId: number) {
+		const response = await fetch(`/api/fantasy?manager=${managerId}`);
+		// const json = await response.json();
+		// console.log(json.entry_history.points);
+		// console.log(await response.json());
+		fetchedPoints = await response.json();
+		processed++;
+	}
+
+	async function click() {
+		for (let i = 1; i <= managers; i++) {
+			fetchManagerData(i);
+		}
+		// fetchManagerData(1);
+	}
+
+	// async function click() {
+	// 	const response = await fetch('/api/fantasy/123?min=1&max=10');
+	// 	console.log(await response.json());
+	// }
 </script>
 
-<svelte:head>
-	<title>Home</title>
-	<meta name="description" content="Svelte demo app" />
-</svelte:head>
-
-<section>
-	<h1>
-		<span class="welcome">
-			<picture>
-				<source srcset={welcome} type="image/webp" />
-				<img src={welcome_fallback} alt="Welcome" />
-			</picture>
-		</span>
-
-		to your new<br />SvelteKit app
-	</h1>
-
-	<h2>
-		try editing <strong>src/routes/+page.svelte</strong>
-	</h2>
-
-	<Counter />
-</section>
-
-<style>
-	section {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		flex: 0.6;
-	}
-
-	h1 {
-		width: 100%;
-	}
-
-	.welcome {
-		display: block;
-		position: relative;
-		width: 100%;
-		height: 0;
-		padding: 0 0 calc(100% * 495 / 2048) 0;
-	}
-
-	.welcome img {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		top: 0;
-		display: block;
-	}
-</style>
+<h1>Hello and welcome to my site!</h1>
+<a href="/about">About my site</a>
+<button class="btn" on:click={click}>BATON</button>
+<progress class="progress progress-error w-56" value={processed} max={managers} />
+<p>Points: {fetchedPoints}</p>
+<p>Processed: {processed}</p>
